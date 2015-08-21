@@ -5,6 +5,9 @@ namespace ModelGeneratorTool.Utilities
 {
     public class RegisterInIocContainer
     {
+        /// <summary>
+        /// Register Dependencies
+        /// </summary>
         public static void RegisterDependencies()
         {
             IUnityContainer unitycontainer = new UnityContainer();
