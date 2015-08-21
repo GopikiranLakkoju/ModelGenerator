@@ -34,18 +34,33 @@ namespace ModelGeneratorTool
         {
             InitializeComponent();
             EventSubscribtion();
-            btnPreview.IsEnabled = btnCopyCode.IsEnabled = false;
+            btnAddForPreview.IsEnabled = btnCopyCode.IsEnabled = false;
             cbProvider.ItemsSource = new string[] { Messages.SQLSERVER/*, Messages.Oracle*/ };
             cbProvider.SelectedIndex = 0;
-            LoadConnectionCombos();
             txtBlkDisclaimer.Text = Messages.Disclaimer;
             this.Title = "ModelGenerator " + DBConnection.Version;
         }
 
         #endregion
         #region Events
+        /// <summary>
+        /// Subscribe events for controls
+        /// </summary>
         private void EventSubscribtion()
         {
+            // loaded event for window
+            Loaded += (sender, e) =>
+            {
+                try
+                {
+                    LoadConnectionCombos();
+                }
+                catch (Exception ex)
+                {
+                    Logger.LogErrorIntoFile(ex);
+                    this.ShowMessageAsync(Messages.Error, Messages.SomeThingWrong);
+                }
+            };
             // datasource selection changed
             cbDataSource.SelectionChanged += (sender, e) =>
             {
@@ -113,33 +128,40 @@ namespace ModelGeneratorTool
                     string message = await ModelGenerator.GenerateModelAsync(userInputs, propertyList);
                     if (message.Contains("Successful"))
                     {
-                        this.ShowMessageAsync(Messages.Success, message);
+                        await this.ShowMessageAsync(Messages.Success, message);
                         ClearControlsDataSource();
                     }
                     else
                     {
-                        this.ShowMessageAsync(Messages.Failed, message);
+                        await this.ShowMessageAsync(Messages.Failed, message);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Logger.LogErrorIntoFile(ex.Message);
+                    Logger.LogErrorIntoFile(ex);
+                    this.ShowMessageAsync(Messages.Error, Messages.SomeThingWrong);
                 }
             };
 
             // Connection Status click event
             btnLoadTables.Click += async (sender, e) =>
             {
-                //var progressDialog = await this.ShowProgressAsync("Please wait...", Messages.TestingConnection);
-                bool status = await LoadTablesAsync();
-                //await progressDialog.CloseAsync();
-                if (status)
+                try
                 {
-                    await this.ShowMessageAsync(Messages.Success, Messages.ConnectionSuccessful);
+                    bool status = await LoadTablesAsync();
+                    if (status)
+                    {
+                        await this.ShowMessageAsync(Messages.Success, Messages.ConnectionSuccessful);
+                    }
+                    else
+                    {
+                        await this.ShowMessageAsync(Messages.Failed, Messages.ConnectionFailed);
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    await this.ShowMessageAsync(Messages.Failed, Messages.ConnectionFailed);
+                    Logger.LogErrorIntoFile(ex);
+                    this.ShowMessageAsync(Messages.Error, Messages.SomeThingWrong);
                 }
             };
 
@@ -157,30 +179,38 @@ namespace ModelGeneratorTool
                 string source = txtDataSource.Text.Trim();
                 string database = txtDatabase.Text.Trim();
                 string schema = txtSchema.Text.Trim();
-                if (!(string.IsNullOrEmpty(source) || string.IsNullOrEmpty(database) || string.IsNullOrEmpty(schema)))
+                try
                 {
-                    if (!(cbDataSource.Items.Contains(source) && cbDatabase.Items.Contains(database) && cbSchema.Items.Contains(schema)))
+                    if (!(string.IsNullOrEmpty(source) || string.IsNullOrEmpty(database) || string.IsNullOrEmpty(schema)))
                     {
-                        string conString = source + "," + database + "," + schema;
-                        var writer = new ConnectionWriterReader();
-                        if (writer.WriteConnection(conString))
+                        if (!(cbDataSource.Items.Contains(source) && cbDatabase.Items.Contains(database) && cbSchema.Items.Contains(schema)))
                         {
-                            LoadConnectionCombos();
-                            this.ShowMessageAsync(Messages.Success, Messages.ConnectionSaveSuccessful);
+                            string conString = source + "," + database + "," + schema;
+                            var writer = new ConnectionWriterReader();
+                            if (writer.WriteConnection(conString))
+                            {
+                                LoadConnectionCombos();
+                                this.ShowMessageAsync(Messages.Success, Messages.ConnectionSaveSuccessful);
+                            }
+                            else
+                            {
+                                this.ShowMessageAsync(Messages.Failed, Messages.ConnectionSaveUnSuccessful);
+                            }
+                            return;
                         }
                         else
                         {
-                            this.ShowMessageAsync(Messages.Failed, Messages.ConnectionSaveUnSuccessful);
+                            this.ShowMessageAsync(Messages.Failed, Messages.ConnectionAlreadyPresent);
+                            return;
                         }
-                        return;
                     }
-                    else
-                    {
-                        this.ShowMessageAsync(Messages.Failed, Messages.ConnectionAlreadyPresent);
-                        return;
-                    }
+                    this.ShowMessageAsync(Messages.Failed, Messages.EnterMandatoryFields);
                 }
-                this.ShowMessageAsync(Messages.Failed, Messages.EnterMandatoryFields);
+                catch (Exception ex)
+                {
+                    Logger.LogErrorIntoFile(ex);
+                    this.ShowMessageAsync(Messages.Error, Messages.SomeThingWrong);
+                }
             };
             // Remove connection event
             btnRemoveConnection.Click += (sender, e) =>
@@ -188,18 +218,26 @@ namespace ModelGeneratorTool
                 string source = txtDataSource.Text.Trim();
                 string database = txtDatabase.Text.Trim();
                 string schema = txtSchema.Text.Trim();
-                if (!(string.IsNullOrEmpty(source) && string.IsNullOrEmpty(database) && string.IsNullOrEmpty(schema)))
+                try
                 {
-                    var reader = new ConnectionWriterReader();
-                    if (reader.DeleteConnection(source, database, schema))
-                        this.ShowMessageAsync(Messages.Success, Messages.DeletionSuccessful);
+                    if (!(string.IsNullOrEmpty(source) && string.IsNullOrEmpty(database) && string.IsNullOrEmpty(schema)))
+                    {
+                        var reader = new ConnectionWriterReader();
+                        if (reader.DeleteConnection(source, database, schema))
+                            this.ShowMessageAsync(Messages.Success, Messages.DeletionSuccessful);
+                        else
+                            this.ShowMessageAsync(Messages.Failed, string.Format(Messages.DeletionUnSuccessful, source, database, schema));
+                        LoadConnectionCombos();
+                    }
                     else
-                        this.ShowMessageAsync(Messages.Failed, string.Format(Messages.DeletionUnSuccessful, source, database, schema));
-                    LoadConnectionCombos();
+                    {
+                        this.ShowMessageAsync(Messages.Failed, Messages.EnterMandatoryFields);
+                    }
                 }
-                else
+                catch (Exception ex)
                 {
-                    this.ShowMessageAsync(Messages.Failed, Messages.EnterMandatoryFields);
+                    Logger.LogErrorIntoFile(ex);
+                    this.ShowMessageAsync(Messages.Error, Messages.SomeThingWrong);
                 }
             };
             // Tables selection event
@@ -227,42 +265,51 @@ namespace ModelGeneratorTool
                         {
                             lbColumns.ItemsSource = columnCollection;
                             lbColumns.DisplayMemberPath = "ColumnName";
-                            btnPreview.IsEnabled = true;
+                            btnAddForPreview.IsEnabled = true;
                         }
                     }
                     catch (Exception ex)
                     {
-                        Logger.LogErrorIntoFile(ex.Message);
+                        Logger.LogErrorIntoFile(ex);
+                        this.ShowMessageAsync(Messages.Error, Messages.SomeThingWrong);
                     }
                 }
             };
             // Preview button click event
-            btnPreview.Click += (sender, e) =>
+            btnAddForPreview.Click += (sender, e) =>
             {
                 string selectedColumns = "";
                 var selected = lbColumns.SelectedItems;
-                if (selected.Count > 0)
+                try
                 {
-                    var obsoleteCols = _properties.Where(x => x.Key.Contains(lbTables.SelectedValue.ToString())).ToList();
-                    for (int i = 0; i < obsoleteCols.Count; i++)
+                    if (selected.Count > 0)
                     {
-                        _properties.Remove(obsoleteCols[i].Key);
+                        var obsoleteCols = _properties.Where(x => x.Key.Contains(lbTables.SelectedValue.ToString())).ToList();
+                        for (int i = 0; i < obsoleteCols.Count; i++)
+                        {
+                            _properties.Remove(obsoleteCols[i].Key);
+                        }
+                        for (int i = 0; i < selected.Count; i++)
+                        {
+                            _properties.Add(count + "," + lbTables.SelectedValue.ToString(), selected[i] as Property);
+                            count++;
+                        }
+                        for (int i = 0; i < _properties.Count; i++)
+                        {
+                            var sortedProperties = _properties.OrderBy(x => Convert.ToInt32(x.Key.Split(',')[0]));
+                            selectedColumns += sortedProperties.ElementAt(i).Value.ColumnName + ",";
+                        }
+                        selectedColumns = selectedColumns.Substring(0, selectedColumns.Length - 1);
+                        txtPreviewColumns.Text = selectedColumns;
+                        return;
                     }
-                    for (int i = 0; i < selected.Count; i++)
-                    {
-                        _properties.Add(count + "," + lbTables.SelectedValue.ToString(), selected[i] as Property);
-                        count++;
-                    }
-                    for (int i = 0; i < _properties.Count; i++)
-                    {
-                        var sortedProperties = _properties.OrderBy(x => Convert.ToInt32(x.Key.Split(',')[0]));
-                        selectedColumns += sortedProperties.ElementAt(i).Value.ColumnName + ",";
-                    }
-                    selectedColumns = selectedColumns.Substring(0, selectedColumns.Length - 1);
-                    txtPreviewColumns.Text = selectedColumns;
-                    return;
+                    this.ShowMessageAsync(Messages.Failed, Messages.SelectAnyColumns);
                 }
-                this.ShowMessageAsync(Messages.Failed, Messages.SelectAnyColumns);
+                catch (Exception ex)
+                {
+                    Logger.LogErrorIntoFile(ex);
+                    this.ShowMessageAsync(Messages.Error, Messages.SomeThingWrong);
+                }
             };
             // ClearAll button click event
             btnClearAll.Click += (sender, e) =>
@@ -309,8 +356,10 @@ namespace ModelGeneratorTool
                     {
                         copyString = ModelGenerator.CopyPropertyStrings(properties, chkBackingField.IsChecked == true);
                     }
+                    System.Windows.Clipboard.SetText(copyString);
+                    return;
                 }
-                System.Windows.Clipboard.SetText(copyString);
+                this.ShowMessageAsync(Messages.Failed, Messages.CopyError);
             };
             // CopyCode checkbox click event
             chkCopyCode.Click += (sender, e) =>
@@ -321,32 +370,32 @@ namespace ModelGeneratorTool
 
         #endregion
         #region Private Methods
+        /// <summary>
+        /// Loads tables into Table listbox
+        /// </summary>
+        /// <returns>Asynchronous Task of type bool</returns>
         private async System.Threading.Tasks.Task<bool> LoadTablesAsync()
         {
-            try
+            await System.Threading.Tasks.Task.Delay(50);
+            string source = txtDataSource.Text.Trim();
+            string database = txtDatabase.Text.Trim();
+            string schema = txtSchema.Text.Trim();
+            string conString = string.Format(Messages.SourceDatabaseSchema, source, database);
+            string query = string.Format(Messages.SchemaOnTables, database, schema);
+            if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(database)) return false;
+            var helper = new DBHelper();
+            tableCollections = await helper.ExecuteReaderAsync(conString, query);
+            if (tableCollections.Count() > 0)
             {
-                await System.Threading.Tasks.Task.Delay(50);
-                string source = txtDataSource.Text.Trim();
-                string database = txtDatabase.Text.Trim();
-                string schema = txtSchema.Text.Trim();
-                string conString = string.Format(Messages.SourceDatabaseSchema, source, database);
-                string query = string.Format(Messages.SchemaOnTables, database, schema);
-                if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(database)) return false;
-                var helper = new DBHelper();
-                tableCollections = await helper.ExecuteReaderAsync(conString, query);
-                if (tableCollections.Count() > 0)
-                {
-                    lbTables.ItemsSource = tableCollections;
-                    return true;
-                }
-                return false;
+                lbTables.ItemsSource = tableCollections;
+                return true;
             }
-            catch
-            {
-                return false;
-            }
+            return false;
         }
 
+        /// <summary>
+        /// Gets connections available in the file and loads into dropdowns
+        /// </summary>
         private void LoadConnectionCombos()
         {
             ClearComboControls();
@@ -365,6 +414,9 @@ namespace ModelGeneratorTool
             }
         }
 
+        /// <summary>
+        /// Clears all combobox values
+        /// </summary>
         private void ClearComboControls()
         {
             cbDataSource.Items.Clear();
@@ -378,19 +430,22 @@ namespace ModelGeneratorTool
             cbSchema.SelectedIndex = 0;
         }
 
+        /// <summary>
+        /// Sets the controls default values, and controls with ItemSource to null
+        /// </summary>
         private void ClearControlsDataSource()
         {
             lbColumns.ItemsSource = null;
             txtPreviewColumns.Text = string.Empty;
             txtPath.Text = string.Empty;
             cbProvider.SelectedIndex = 0;
-            btnPreview.IsEnabled = false;
+            btnAddForPreview.IsEnabled = false;
             txtModelName.Text = string.Empty;
-            txtPropertyNames.Text = string.Empty;            
+            txtPropertyNames.Text = string.Empty;
             txtSearchTables.Text = string.Empty;
-            chkCopyCode.IsChecked = chkInterfaceRequired.IsChecked = chkOrmRequired.IsChecked = 
+            chkCopyCode.IsChecked = chkInterfaceRequired.IsChecked = chkOrmRequired.IsChecked =
                 chkBackingField.IsChecked = chkValidation.IsChecked = btnCopyCode.IsEnabled = false;
-            lbTables.SelectedIndex = -1;            
+            lbTables.SelectedIndex = -1;
         }
         #endregion
     }

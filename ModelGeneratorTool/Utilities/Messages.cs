@@ -121,5 +121,21 @@
         /// *Note: Please consider Database, Datasource and Schema as mandatory, these inputs to 'Test Connection' and populate tables in table dropdown, any exceptions can be traced in BugReports folder
         /// </summary>
         public const string Disclaimer = "*Note: Please consider Database, Datasource and Schema as mandatory, these input to 'Load Tables' and populate tables in table's ListBox, any exceptions can be traced in BugReports folder";
+        /// <summary>
+        /// ERROR
+        /// </summary>
+        public const string Error = "ERROR";
+        /// <summary>
+        /// Some thing went wrong, please check BugReports folder for the cause...
+        /// </summary>
+        public const string SomeThingWrong = "Some thing went wrong, please check BugReports folder for the cause...";
+        /// <summary>
+        /// For Copy function to work, enter strings in csv format
+        /// </summary>
+        public const string CopyError = "For Copy function to work, enter strings in csv format";
+        /// <summary>
+        /// Connections are stored in Connections.txt file, which is not found...
+        /// </summary>
+        public const string ConnectionFileMissing = "Connections are stored in Connections.txt file, which is not found...";
     }
 }

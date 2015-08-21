@@ -31,37 +31,29 @@ namespace ModelGeneratorTool.Utilities
         /// </summary>
         public async System.Threading.Tasks.Task<string> GenerateModelAsync(dynamic userInputs, List<Property> properties)
         {
-            try
+            _version = userInputs.Version;
+            if (userInputs.DbType == Messages.Oracle) return Messages.OracleSupport;
+            if (!string.IsNullOrEmpty(userInputs.TableName) && properties.Count == 0)
             {
-                _version = userInputs.Version;
-                if (userInputs.DbType == Messages.Oracle) return Messages.OracleSupport;
-                if (!string.IsNullOrEmpty(userInputs.TableName) && properties.Count == 0)
-                {
-                    string inputConString = string.Format(Messages.SourceDatabaseSchema, userInputs.DataSource, userInputs.DataBase);
-                    var query = string.Format(Messages.SchemaOnColumns, userInputs.TableName);
-                    List<Property> propList = await new DBHelper().ExecuteReaderOnColumnsAsync(inputConString, query);
-                    int status = 0;
-                    UpdatePropertyNames(userInputs.PropertyNames, ref propList, ref status);
-                    return CreateFile(propList, userInputs);
-                }
-                else if (!string.IsNullOrEmpty(userInputs.DataSource) && !string.IsNullOrEmpty(userInputs.DataBase))
-                {
-                    int status = 0;
-                    UpdatePropertyNames(userInputs.PropertyNames, ref properties, ref status);
-                    if (status == 1)
-                        return Messages.CustomPropertiesInvalid;
-                    return CreateFile(properties, userInputs);
-
-                }
-                else
-                {
-                    return Messages.DatabaseTableProviderMandate;
-                }
+                string inputConString = string.Format(Messages.SourceDatabaseSchema, userInputs.DataSource, userInputs.DataBase);
+                var query = string.Format(Messages.SchemaOnColumns, userInputs.TableName);
+                List<Property> propList = await new DBHelper().ExecuteReaderOnColumnsAsync(inputConString, query);
+                int status = 0;
+                UpdatePropertyNames(userInputs.PropertyNames, ref propList, ref status);
+                return CreateFile(propList, userInputs);
             }
-            catch (Exception ex)
+            else if (!string.IsNullOrEmpty(userInputs.DataSource) && !string.IsNullOrEmpty(userInputs.DataBase))
             {
-                new Logger().LogErrorIntoFile(ex.Message);
-                return null;
+                int status = 0;
+                UpdatePropertyNames(userInputs.PropertyNames, ref properties, ref status);
+                if (status == 1)
+                    return Messages.CustomPropertiesInvalid;
+                return CreateFile(properties, userInputs);
+
+            }
+            else
+            {
+                return Messages.DatabaseTableProviderMandate;
             }
         }
 

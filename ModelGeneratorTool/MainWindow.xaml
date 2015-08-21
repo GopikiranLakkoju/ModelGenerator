@@ -36,7 +36,7 @@
         <ListBox x:Name="lbTables" HorizontalAlignment="Left" Height="150" Margin="118,312,0,0" VerticalAlignment="Top" Width="190" ToolTip="Tables"/>
         <ListBox x:Name="lbColumns" HorizontalAlignment="Left" Height="150" Margin="327,313,0,0" VerticalAlignment="Top" Width="190" SelectionMode="Extended" ToolTip="Columns relate to selected table"/>
         <Button x:Name="btnClearAll" Content="Clear All" Style="{StaticResource ResourceKey=MetroButton}" HorizontalAlignment="Left" Margin="531,354,0,0" VerticalAlignment="Top" Width="55" ToolTip="Clear all values selected"/>
-        <Button x:Name="btnPreview" Content="Add" Style="{StaticResource ResourceKey=MetroButton}" HorizontalAlignment="Left" Margin="531,381,0,0" VerticalAlignment="Top" Width="55" ToolTip="Add Columns"/>
+        <Button x:Name="btnAddForPreview" Content="Add" Style="{StaticResource ResourceKey=MetroButton}" HorizontalAlignment="Left" Margin="531,381,0,0" VerticalAlignment="Top" Width="55" ToolTip="Add Columns"/>
         <Label x:Name="lblPrevColumns" Content="Preview Columns" HorizontalAlignment="Left" Margin="15,472,0,0" VerticalAlignment="Top"/>
         <TextBox x:Name="txtPreviewColumns" Controls:TextBoxHelper.ClearTextButton="True" HorizontalAlignment="Left" VerticalContentAlignment="Center" Height="50" Margin="118,472,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="399" VerticalScrollBarVisibility="Visible" IsReadOnly="True" ToolTip="Preview Selected Columns"/>
         <Label x:Name="lblPropertyNames" Content="Property Names" HorizontalAlignment="Left" Margin="15,523,0,0" VerticalAlignment="Top"/>

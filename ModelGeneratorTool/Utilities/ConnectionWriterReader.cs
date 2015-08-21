@@ -26,10 +26,9 @@ namespace ModelGeneratorTool.Utilities
                 }
                 return true;
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                new Logger().LogErrorIntoFile(e.Message);
-                return false;
+                throw;
             }
         }
 
@@ -106,14 +105,12 @@ namespace ModelGeneratorTool.Utilities
                 }
                 else
                 {
-                    new Logger().LogErrorIntoFile("Connections.txt file does not exist..");
-                    throw new Exception("Connections.txt file does not exist..");
+                    throw new Exception(Messages.ConnectionFileMissing);
                 }
             }
-            catch (Exception e)
+            catch (Exception)
             {
-                new Logger().LogErrorIntoFile(e.Message);
-                return false;
+                throw;
             }
         }
     }    

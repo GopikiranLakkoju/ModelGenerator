@@ -51,9 +51,7 @@ namespace ModelGeneratorTool.Utilities
                 string commandText = query;
                 SqlCommand command = new SqlCommand();
                 command.CommandText = commandText;
-                command.Connection = connection;
-                System.Diagnostics.Stopwatch watch = new System.Diagnostics.Stopwatch();
-                watch.Start();
+                command.Connection = connection;                
                 using (var reader = await command.ExecuteReaderAsync())
                 {
                     while (await reader.ReadAsync())
@@ -69,8 +67,7 @@ namespace ModelGeneratorTool.Utilities
                             TableCatalog = reader.GetString(6)
                         });
                     }
-                }
-                watch.Stop();
+                }                
             }
             return resultList;
         }

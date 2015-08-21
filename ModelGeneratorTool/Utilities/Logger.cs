@@ -11,15 +11,23 @@ namespace ModelGeneratorTool.Utilities
         /// <summary>
         /// <see cref="ILogger.LogErrorIntoFile"/>
         /// </summary>
-        public void LogErrorIntoFile(string error)
+        public void LogErrorIntoFile(Exception exception)
         {
             string filename = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location).Replace("bin", "BugReports").Replace("Debug", "BugReport.txt");          
                         
             lock (new Logger())
-            {               
+            {
+                System.Text.StringBuilder stringBuilder = new System.Text.StringBuilder();
+                stringBuilder.AppendLine("#Exception Cause:");
+                stringBuilder.Append(Environment.NewLine);
+                stringBuilder.AppendLine("Error is due to, " + exception.Message + " " + DateTime.Now.ToString("MMM dd yyyy, h:mm tt", System.Globalization.CultureInfo.InvariantCulture));
+                stringBuilder.Append(Environment.NewLine);
+                stringBuilder.AppendLine("#Exception Trace:");
+                stringBuilder.Append(Environment.NewLine);
+                stringBuilder.Append(exception.StackTrace);
                 using (StreamWriter stream = new StreamWriter(filename, false))
-                {                    
-                    stream.Write(error + " " + DateTime.Now.ToString("dd-MM-yyyy"));
+                {
+                    stream.Write(stringBuilder.ToString());
                 }
             }
         }
