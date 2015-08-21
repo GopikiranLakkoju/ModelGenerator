@@ -36,7 +36,7 @@ namespace ModelGeneratorTool.Utilities
         /// Reads connections written into file
         /// </summary>
         /// <returns>Returns List of connections available</returns>
-        public List<Connection> ReadConnections()
+        public IEnumerable<Connection> ReadConnections()
         {
             var filePath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location).Replace("bin", "Connection").Replace("Debug", "Connections.txt");
             if (System.IO.File.Exists(filePath))
