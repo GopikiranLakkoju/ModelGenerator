@@ -37,7 +37,7 @@ namespace ModelGeneratorTool.Utilities
             {
                 string inputConString = string.Format(Messages.SourceDatabaseSchema, userInputs.DataSource, userInputs.DataBase);
                 var query = string.Format(Messages.SchemaOnColumns, userInputs.TableName);
-                List<Property> propList = await new DBHelper().ExecuteReaderOnColumnsAsync(inputConString, query);
+                List<Property> propList = await new DbHelper().ExecuteReaderOnColumnsAsync(inputConString, query);
                 int status = 0;
                 UpdatePropertyNames(userInputs.PropertyNames, ref propList, ref status);
                 return CreateFile(propList, userInputs);
@@ -228,7 +228,7 @@ namespace ModelGeneratorTool.Utilities
                 {
                     codeWriter.AppendLine("    /// <see cref=\"" + "I" + _modelName + "." + propertyName + "\"/>");
                 }
-                else if (property.DataType == PropertyNames.UNIQUEIDENTIFIER)
+                else if (property.DataType == PropertyNames.Uniqueidentifier)
                 {
                     codeWriter.AppendLine("    /// " + property.TableName + "." + property.ColumnName + " refers " + property.ColumnName.Replace("GUID", string.Empty) + " table in " + property.Schema + "." + property.TableCatalog + " with type " + property.DataType);
 
@@ -280,14 +280,14 @@ namespace ModelGeneratorTool.Utilities
                             new XElement("Properties",
                                 properties.Select(property =>
                                 new XElement("Property",
-                                  new XElement(PropertyNames.COLUMNNAME, property.ColumnName),
-                                  new XElement(PropertyNames.PROPERTYNAME, property.PropertyName),
-                                  new XElement(PropertyNames.DATATYPE, property.DataType),
-                                  new XElement(PropertyNames.MAXLENGTH, property.MaxLength),
-                                  new XElement(PropertyNames.ISNULLABLE, property.IsNullable),
-                                  new XElement(PropertyNames.SCHEMA, property.Schema),
-                                  new XElement(PropertyNames.TABLECATALOG, property.TableCatalog),
-                                  new XElement(PropertyNames.TABLENAME, property.TableName)))));
+                                  new XElement(PropertyNames.Columnname, property.ColumnName),
+                                  new XElement(PropertyNames.Propertyname, property.PropertyName),
+                                  new XElement(PropertyNames.Datatype, property.DataType),
+                                  new XElement(PropertyNames.Maxlength, property.MaxLength),
+                                  new XElement(PropertyNames.Isnullable, property.IsNullable),
+                                  new XElement(PropertyNames.Schema, property.Schema),
+                                  new XElement(PropertyNames.Tablecatalog, property.TableCatalog),
+                                  new XElement(PropertyNames.Tablename, property.TableName)))));
             xml.Save(_filePath.Replace(".g.cs", "").Replace("I", "") + ".orm.g.xml");
         }
 
@@ -301,37 +301,37 @@ namespace ModelGeneratorTool.Utilities
             string type = "";
             switch (property.DataType)
             {
-                case PropertyNames.UNIQUEIDENTIFIER:
-                    type = PropertyNames.GUID;
+                case PropertyNames.Uniqueidentifier:
+                    type = PropertyNames.Guid;
                     break;
-                case PropertyNames.CHAR:
-                case PropertyNames.TEXT:
-                case PropertyNames.VARCHAR:
-                case PropertyNames.NCHAR:
-                case PropertyNames.NVARCHAR:
-                case PropertyNames.NTEXT:
-                    type = PropertyNames.STRING;
+                case PropertyNames.Char:
+                case PropertyNames.Text:
+                case PropertyNames.Varchar:
+                case PropertyNames.Nchar:
+                case PropertyNames.Nvarchar:
+                case PropertyNames.Ntext:
+                    type = PropertyNames.String;
                     break;
-                case PropertyNames.BIT:
-                    type = PropertyNames.BOOL;
+                case PropertyNames.Bit:
+                    type = PropertyNames.Bool;
                     break;
-                case PropertyNames.INT:
-                case PropertyNames.BIGINT:
-                case PropertyNames.SMALLINT:
-                case PropertyNames.TINYINT:
-                    type = PropertyNames.INT;
+                case PropertyNames.Int:
+                case PropertyNames.Bigint:
+                case PropertyNames.Smallint:
+                case PropertyNames.Tinyint:
+                    type = PropertyNames.Int;
                     break;
-                case PropertyNames.DECIMAL:
-                    type = PropertyNames.DECIMAL;
+                case PropertyNames.Decimal:
+                    type = PropertyNames.Decimal;
                     break;
-                case PropertyNames.FLOAT:
-                    type = PropertyNames.FLOAT;
+                case PropertyNames.Float:
+                    type = PropertyNames.Float;
                     break;
-                case PropertyNames.DATE:
-                case PropertyNames.DATETIME:
-                case PropertyNames.DATETIME2:
-                case PropertyNames.TIME:
-                    type = PropertyNames.DATETIME;
+                case PropertyNames.Date:
+                case PropertyNames.Datetime:
+                case PropertyNames.Datetime2:
+                case PropertyNames.Time:
+                    type = PropertyNames.Datetime;
                     break;
             }
             type = property.IsNullable ? type + "?" : type;

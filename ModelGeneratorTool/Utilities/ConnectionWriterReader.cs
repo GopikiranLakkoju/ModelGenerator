@@ -17,19 +17,16 @@ namespace ModelGeneratorTool.Utilities
         /// <returns>returns true if success, else false</returns>
         public bool WriteConnection(string connectionString)
         {
-            try
+            var directoryName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            if (directoryName != null)
             {
-                string filePath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location).Replace("bin", "Connection").Replace("Debug", "Connections.txt");
+                string filePath = directoryName.Replace("bin", "Connection").Replace("Debug", "Connections.txt");
                 using (StreamWriter conWriter = new StreamWriter(filePath, true))
                 {
                     conWriter.Write(connectionString + "|");
                 }
-                return true;
             }
-            catch (Exception)
-            {
-                throw;
-            }
+            return true;
         }
 
         /// <summary>
@@ -42,13 +39,12 @@ namespace ModelGeneratorTool.Utilities
             if (System.IO.File.Exists(filePath))
             {
                 var connections = new List<Connection>();
-                Connection connection;
                 using (StreamReader stream = new StreamReader(filePath))
                 {
                     var connectionStr = stream.ReadToEnd().Split('|');
                     for (int i = 0; i < connectionStr.Length - 1; i++)
                     {
-                        connection = new Connection { DataSource = connectionStr[i].Split(',')[0], Database = connectionStr[i].Split(',')[1], Schema = connectionStr[i].Split(',')[2] };
+                        var connection = new Connection { DataSource = connectionStr[i].Split(',')[0], Database = connectionStr[i].Split(',')[1], Schema = connectionStr[i].Split(',')[2] };
                         connections.Add(connection);
                     }
                 }
@@ -66,52 +62,41 @@ namespace ModelGeneratorTool.Utilities
         /// <returns>Returns true if deleted, else false</returns>
         public bool DeleteConnection(string source, string database, string schema)
         {
-            try
+            bool status = false;
+            int removeIndex = 0;
+            var filePath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location).Replace("bin", "Connection").Replace("Debug", "Connections.txt");
+            if (System.IO.File.Exists(filePath))
             {
-                bool status = false;
-                int removeIndex = 0;
-                var filePath = System.IO.Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location).Replace("bin", "Connection").Replace("Debug", "Connections.txt");
-                if (System.IO.File.Exists(filePath))
+                string[] connections;
+                using (StreamReader stream = new StreamReader(filePath))
                 {
-                    var connections = new string[] { };
-                    using (StreamReader stream = new StreamReader(filePath))
+                    connections = stream.ReadToEnd().Split('|');
+                    for (int i = 0; i < connections.Length - 1; i++)
                     {
-                        connections = stream.ReadToEnd().Split('|');
-                        for (int i = 0; i < connections.Length - 1; i++)
+                        if (connections[i].Split(',')[0].Equals(source) && connections[i].Split(',')[1].Equals(database) && connections[i].Split(',')[2].Equals(schema))
                         {
-                            if (connections[i].Split(',')[0].Equals(source) && connections[i].Split(',')[1].Equals(database) && connections[i].Split(',')[2].Equals(schema))
-                            {
-                                removeIndex = i;
-                                status = true;
-                            }
+                            removeIndex = i;
+                            status = true;
                         }
                     }
-                    if (status)
-                    {
-                        File.Delete(filePath);
-                        for (int i = 0; i < connections.Length - 1; i++)
-                        {                            
-                            using (StreamWriter writer = new StreamWriter(filePath, true))
-                            {
-                                if (i != removeIndex)
-                                {
-                                    writer.Write(connections[i] + "|");
-                                }
-                            }
-                        }
-                        return status;
-                    }
-                    return status;
                 }
-                else
+                if (status)
                 {
-                    throw new Exception(Messages.ConnectionFileMissing);
+                    File.Delete(filePath);
+                    for (int i = 0; i < connections.Length - 1; i++)
+                    {                            
+                        using (StreamWriter writer = new StreamWriter(filePath, true))
+                        {
+                            if (i != removeIndex)
+                            {
+                                writer.Write(connections[i] + "|");
+                            }
+                        }
+                    }
                 }
+                return status;
             }
-            catch (Exception)
-            {
-                throw;
-            }
+            throw new Exception(Messages.ConnectionFileMissing);
         }
     }    
 }

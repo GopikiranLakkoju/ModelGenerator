@@ -7,7 +7,7 @@ namespace ModelGeneratorTool.Utilities
     /// <summary>
     /// Database reader
     /// </summary>
-    internal sealed class DBHelper
+    internal sealed class DbHelper
     {
         /// <summary>
         /// Returns list of columns based on the input table name provided
@@ -22,9 +22,11 @@ namespace ModelGeneratorTool.Utilities
             {                
                 connection.Open();
                 string commandText = query;
-                SqlCommand command = new SqlCommand();
-                command.CommandText = commandText;
-                command.Connection = connection;
+                SqlCommand command = new SqlCommand
+                {
+                    CommandText = commandText,
+                    Connection = connection
+                };
                 using (var reader = await command.ExecuteReaderAsync())
                 {
                     while (await reader.ReadAsync())
@@ -49,9 +51,12 @@ namespace ModelGeneratorTool.Utilities
             {
                 connection.Open();
                 string commandText = query;
-                SqlCommand command = new SqlCommand();
-                command.CommandText = commandText;
-                command.Connection = connection;                
+                SqlCommand command = new SqlCommand
+                {
+                    CommandText = commandText,
+                    Connection = connection
+                };
+
                 using (var reader = await command.ExecuteReaderAsync())
                 {
                     while (await reader.ReadAsync())
@@ -62,7 +67,7 @@ namespace ModelGeneratorTool.Utilities
                             ColumnName = reader.GetString(1),
                             DataType = reader.GetString(2),
                             MaxLength = reader.GetValue(3).ToString(),
-                            IsNullable = reader.GetString(4) == "YES" ? true : false,
+                            IsNullable = reader.GetString(4) == "YES",
                             Schema = reader.GetString(5),
                             TableCatalog = reader.GetString(6)
                         });

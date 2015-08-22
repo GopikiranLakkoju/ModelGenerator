@@ -15,9 +15,9 @@ namespace ModelGeneratorTool
     public partial class MainWindow
     {
         #region Variables
-        private Dictionary<string, Property> _properties = new Dictionary<string, Property>();
-        private IEnumerable<string> tableCollections;
-        private int count = 0;
+        private readonly Dictionary<string, Property> _properties = new Dictionary<string, Property>();
+        private IEnumerable<string> _tableCollections;
+        private int _count = 0;
         //private IModelGenerator _modelGenerator;
         #endregion
         #region PropertyIocInjection
@@ -35,10 +35,10 @@ namespace ModelGeneratorTool
             InitializeComponent();
             EventSubscribtion();
             btnAddForPreview.IsEnabled = btnCopyCode.IsEnabled = false;
-            cbProvider.ItemsSource = new string[] { Messages.SQLSERVER/*, Messages.Oracle*/ };
+            cbProvider.ItemsSource = new[] { Messages.SQLSERVER/*, Messages.Oracle*/ };
             cbProvider.SelectedIndex = 0;
             txtBlkDisclaimer.Text = Messages.Disclaimer;
-            this.Title = "ModelGenerator " + DBConnection.Version;
+            this.Title = "ModelGenerator " + DbConnection.Version;
         }
 
         #endregion
@@ -117,7 +117,7 @@ namespace ModelGeneratorTool
                         ValidationRequired = validationRequired,
                         PropertyNames = propertyNames,
                         DbType = dbType,
-                        Version = DBConnection.Version
+                        DbConnection.Version
                     };
                     var propertyList = new List<Property>();
                     for (int i = 0; i < _properties.Count; i++)
@@ -139,7 +139,7 @@ namespace ModelGeneratorTool
                 catch (Exception ex)
                 {
                     Logger.LogErrorIntoFile(ex);
-                    this.ShowMessageAsync(Messages.Error, Messages.SomeThingWrong);
+                    await this.ShowMessageAsync(Messages.Error, Messages.SomeThingWrong);
                 }
             };
 
@@ -161,7 +161,7 @@ namespace ModelGeneratorTool
                 catch (Exception ex)
                 {
                     Logger.LogErrorIntoFile(ex);
-                    this.ShowMessageAsync(Messages.Error, Messages.SomeThingWrong);
+                    await this.ShowMessageAsync(Messages.Error, Messages.SomeThingWrong);
                 }
             };
 
@@ -198,11 +198,8 @@ namespace ModelGeneratorTool
                             }
                             return;
                         }
-                        else
-                        {
-                            this.ShowMessageAsync(Messages.Failed, Messages.ConnectionAlreadyPresent);
-                            return;
-                        }
+                        this.ShowMessageAsync(Messages.Failed, Messages.ConnectionAlreadyPresent);
+                        return;
                     }
                     this.ShowMessageAsync(Messages.Failed, Messages.EnterMandatoryFields);
                 }
@@ -259,7 +256,7 @@ namespace ModelGeneratorTool
                         }
 
                         lbColumns.ItemsSource = null;
-                        var helper = new DBHelper();
+                        var helper = new DbHelper();
                         var columnCollection = await helper.ExecuteReaderOnColumnsAsync(conString, query);
                         if (columnCollection.Count() > 0)
                         {
@@ -271,7 +268,7 @@ namespace ModelGeneratorTool
                     catch (Exception ex)
                     {
                         Logger.LogErrorIntoFile(ex);
-                        this.ShowMessageAsync(Messages.Error, Messages.SomeThingWrong);
+                        await this.ShowMessageAsync(Messages.Error, Messages.SomeThingWrong);
                     }
                 }
             };
@@ -291,8 +288,8 @@ namespace ModelGeneratorTool
                         }
                         for (int i = 0; i < selected.Count; i++)
                         {
-                            _properties.Add(count + "," + lbTables.SelectedValue.ToString(), selected[i] as Property);
-                            count++;
+                            _properties.Add(_count + "," + lbTables.SelectedValue.ToString(), selected[i] as Property);
+                            _count++;
                         }
                         for (int i = 0; i < _properties.Count; i++)
                         {
@@ -315,16 +312,16 @@ namespace ModelGeneratorTool
             btnClearAll.Click += (sender, e) =>
             {
                 _properties.Clear();
-                count = 0;
+                _count = 0;
                 ClearControlsDataSource();
             };
             // SearchTables TextChanged event
             txtSearchTables.TextChanged += (sender, e) =>
             {
-                if (tableCollections != null && tableCollections.Count() > 0)
+                if (_tableCollections != null && _tableCollections.Count() > 0)
                 {
                     lbColumns.ItemsSource = null;
-                    lbTables.ItemsSource = tableCollections.Where(x => x.IndexOf(txtSearchTables.Text, StringComparison.OrdinalIgnoreCase) >= 0).AsEnumerable();
+                    lbTables.ItemsSource = _tableCollections.Where(x => x.IndexOf(txtSearchTables.Text, StringComparison.OrdinalIgnoreCase) >= 0).AsEnumerable();
                 }
             };
             // SearchTables PreviewKeyDowm event
@@ -364,7 +361,7 @@ namespace ModelGeneratorTool
             // CopyCode checkbox click event
             chkCopyCode.Click += (sender, e) =>
             {
-                btnCopyCode.IsEnabled = chkCopyCode.IsChecked == true ? true : false;
+                btnCopyCode.IsEnabled = chkCopyCode.IsChecked == true;
             };
         }
 
@@ -383,11 +380,11 @@ namespace ModelGeneratorTool
             string conString = string.Format(Messages.SourceDatabaseSchema, source, database);
             string query = string.Format(Messages.SchemaOnTables, database, schema);
             if (string.IsNullOrEmpty(source) || string.IsNullOrEmpty(database)) return false;
-            var helper = new DBHelper();
-            tableCollections = await helper.ExecuteReaderAsync(conString, query);
-            if (tableCollections.Count() > 0)
+            var helper = new DbHelper();
+            _tableCollections = await helper.ExecuteReaderAsync(conString, query);
+            if (_tableCollections.Count() > 0)
             {
-                lbTables.ItemsSource = tableCollections;
+                lbTables.ItemsSource = _tableCollections;
                 return true;
             }
             return false;

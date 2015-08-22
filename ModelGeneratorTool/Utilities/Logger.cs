@@ -5,7 +5,7 @@ using System.Reflection;
 using ModelGeneratorTool.Interfaces;
 
 namespace ModelGeneratorTool.Utilities
-{    
+{
     class Logger : ILogger
     {
         /// <summary>
@@ -13,21 +13,25 @@ namespace ModelGeneratorTool.Utilities
         /// </summary>
         public void LogErrorIntoFile(Exception exception)
         {
-            string filename = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location).Replace("bin", "BugReports").Replace("Debug", "BugReport.txt");          
-                        
-            lock (new Logger())
+            var directoryName = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            if (directoryName != null)
             {
-                System.Text.StringBuilder stringBuilder = new System.Text.StringBuilder();
-                stringBuilder.AppendLine("#Exception Cause:");
-                stringBuilder.Append(Environment.NewLine);
-                stringBuilder.AppendLine("Error is due to, " + exception.Message + " " + DateTime.Now.ToString("MMM dd yyyy, h:mm tt", System.Globalization.CultureInfo.InvariantCulture));
-                stringBuilder.Append(Environment.NewLine);
-                stringBuilder.AppendLine("#Exception Trace:");
-                stringBuilder.Append(Environment.NewLine);
-                stringBuilder.Append(exception.StackTrace);
-                using (StreamWriter stream = new StreamWriter(filename, false))
+                string filename = directoryName.Replace("bin", "BugReports").Replace("Debug", "BugReport.txt");
+
+                lock (new Logger())
                 {
-                    stream.Write(stringBuilder.ToString());
+                    System.Text.StringBuilder stringBuilder = new System.Text.StringBuilder();
+                    stringBuilder.AppendLine("#Exception Cause:");
+                    stringBuilder.Append(Environment.NewLine);
+                    stringBuilder.AppendLine("Error is due to, " + exception.Message + " " + DateTime.Now.ToString("MMM dd yyyy, h:mm tt", System.Globalization.CultureInfo.InvariantCulture));
+                    stringBuilder.Append(Environment.NewLine);
+                    stringBuilder.AppendLine("#Exception Trace:");
+                    stringBuilder.Append(Environment.NewLine);
+                    stringBuilder.Append(exception.StackTrace);
+                    using (StreamWriter stream = new StreamWriter(filename, false))
+                    {
+                        stream.Write(stringBuilder.ToString());
+                    }
                 }
             }
         }
@@ -37,8 +41,7 @@ namespace ModelGeneratorTool.Utilities
         /// </summary>
         public void LogErrorIntoEventLog(string error)
         {
-            EventLog log = new EventLog("Application");
-            log.Source = Assembly.GetExecutingAssembly().ToString();
+            EventLog log = new EventLog("Application") { Source = Assembly.GetExecutingAssembly().ToString() };
             log.WriteEntry(error, EventLogEntryType.Error);
         }
     }

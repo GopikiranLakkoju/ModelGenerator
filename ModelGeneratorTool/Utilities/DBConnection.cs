@@ -5,26 +5,18 @@ namespace ModelGeneratorTool.Utilities
     /// <summary>
     /// Database connection string, this class cannot be inherited
     /// </summary>
-    public sealed class DBConnection
+    public sealed class DbConnection
     {
-        private string sqlconnection = "";        
-
-        public DBConnection()
+        public DbConnection()
         {
-            sqlconnection = ConfigurationManager.ConnectionStrings["SqlConnection"].ConnectionString;
+            ConnnectionString = ConfigurationManager.ConnectionStrings["SqlConnection"].ConnectionString;
         }
 
         /// <summary>
         /// gets connection string, and its readonly property
         /// </summary>
-        public string ConnnectionString
-        {
-            get { return sqlconnection; }
-        }
+        public string ConnnectionString { get; }
 
-        public static string Version
-        {
-            get { return ConfigurationManager.AppSettings["Version"].ToString(); }
-        }
+        public static string Version => ConfigurationManager.AppSettings["Version"].ToString();
     }
 }

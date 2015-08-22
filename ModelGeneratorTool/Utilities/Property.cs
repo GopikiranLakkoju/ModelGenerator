@@ -47,122 +47,122 @@
         /// <summary>
         /// TableName
         /// </summary>
-        public const string TABLENAME = "TableName";
+        public const string Tablename = "TableName";
         /// <summary>
         /// TableCatalog
         /// </summary>
-        public const string TABLECATALOG = "TableCatalog";
+        public const string Tablecatalog = "TableCatalog";
         /// <summary>
         /// ColumnName
         /// </summary>
-        public const string COLUMNNAME = "ColumnName";
+        public const string Columnname = "ColumnName";
         /// <summary>
         /// PropertyName
         /// </summary>
-        public const string PROPERTYNAME = "PropertyName";
+        public const string Propertyname = "PropertyName";
         /// <summary>
         /// DataType
         /// </summary>
-        public const string DATATYPE = "DataType";
+        public const string Datatype = "DataType";
         /// <summary>
         /// MaxLength
         /// </summary>
-        public const string MAXLENGTH = "MaxLength";
+        public const string Maxlength = "MaxLength";
         /// <summary>
         /// IsNullable
         /// </summary>
-        public const string ISNULLABLE = "IsNullable";
+        public const string Isnullable = "IsNullable";
         /// <summary>
         /// Schema
         /// </summary>
-        public const string SCHEMA = "Schema";
+        public const string Schema = "Schema";
         /// <summary>
         /// uniqueidentifier
         /// </summary>
-        public const string UNIQUEIDENTIFIER = "uniqueidentifier";
+        public const string Uniqueidentifier = "uniqueidentifier";
         /// <summary>
         /// Guid
         /// </summary>
-        public const string GUID = "Guid";
+        public const string Guid = "Guid";
         /// <summary>
         /// UUID
         /// </summary>
-        public const string UUID = "UUID";
+        public const string Uuid = "UUID";
         /// <summary>
         /// Char
         /// </summary>
-        public const string CHAR = "Char";
+        public const string Char = "Char";
         /// <summary>
         /// text
         /// </summary>
-        public const string TEXT = "text";
+        public const string Text = "text";
         /// <summary>
         /// varchar
         /// </summary>
-        public const string VARCHAR = "varchar";
+        public const string Varchar = "varchar";
         /// <summary>
         /// nchar
         /// </summary>
-        public const string NCHAR = "nchar";
+        public const string Nchar = "nchar";
         /// <summary>
         /// nvarchar
         /// </summary>
-        public const string NVARCHAR = "nvarchar";
+        public const string Nvarchar = "nvarchar";
         /// <summary>
         /// ntext
         /// </summary>
-        public const string NTEXT = "ntext";
+        public const string Ntext = "ntext";
         /// <summary>
         /// string
         /// </summary>
-        public const string STRING = "string";
+        public const string String = "string";
         /// <summary>
         /// bit
         /// </summary>
-        public const string BIT = "bit";
+        public const string Bit = "bit";
         /// <summary>
         /// bool
         /// </summary>
-        public const string BOOL = "bool";
+        public const string Bool = "bool";
         /// <summary>
         /// int
         /// </summary>
-        public const string INT = "int";
+        public const string Int = "int";
         /// <summary>
         /// bigint
         /// </summary>
-        public const string BIGINT = "bigint";
+        public const string Bigint = "bigint";
         /// <summary>
         /// smallint
         /// </summary>
-        public const string SMALLINT = "smallint";
+        public const string Smallint = "smallint";
         /// <summary>
         /// tinyint
         /// </summary>
-        public const string TINYINT = "tinyint";
+        public const string Tinyint = "tinyint";
         /// <summary>
         /// decimal
         /// </summary>
-        public const string DECIMAL = "decimal";
+        public const string Decimal = "decimal";
         /// <summary>
         /// float
         /// </summary>
-        public const string FLOAT = "float";
+        public const string Float = "float";
         /// <summary>
         /// date
         /// </summary>
-        public const string DATE = "date";
+        public const string Date = "date";
         /// <summary>
         /// datetime
         /// </summary>
-        public const string DATETIME = "datetime";
+        public const string Datetime = "datetime";
         /// <summary>
         /// datetime2
         /// </summary>
-        public const string DATETIME2 = "datetime2";
+        public const string Datetime2 = "datetime2";
         /// <summary>
         /// time
         /// </summary>
-        public const string TIME = "time";
+        public const string Time = "time";
     }
 }
